@@ -22,6 +22,7 @@ type Competitor = {
   linescores?: Array<{
     value: number
     teeTime?: string
+    linescores: Array<any>; // Hole-by-hole scores
   }>
 }
 
@@ -151,31 +152,43 @@ export default function GolfLeaderboard() {
     return scoreStr // Already has - for under par
   }
 
-  // Get today's score (value from linescores)
   const getTodayScore = (competitor: Competitor): string => {
-    const value = competitor.linescores?.[0]?.value
-    if (value === undefined) return "N/A"
-    if (value === 0) return "E"
-    return value > 0 ? `+${value}` : `${value}`
-  }
+    const lineScores = competitor.linescores;
+  
+    const scores = [
+      lineScores?.[0]?.value,
+      lineScores?.[1]?.value,
+      lineScores?.[2]?.value
+    ]
+      .filter(val => val !== undefined && val !== 0); // Filter out undefined and 0 values
+  
+    if (scores.length > 0) {
+      return scores.join(" | ");
+    }
+  
+    return "";
+  };
+  
 
   // Get thru or tee time based on available data
   const getThruOrTeeTime = (competitor: Competitor): string => {
-    const lineScoreArray = competitor.linescores?.[0]?.linescores
-    const teeTime = competitor.linescores?.[0]?.teeTime
+  const lineScoreArray2 = competitor?.linescores?.[2]?.linescores;
+  const lineScoreArray1 = competitor?.linescores?.[1]?.linescores;
+  const lineScoreArray0 = competitor?.linescores?.[0]?.linescores;
 
-    // Determine Thru or Tee Time based on available data
-    const thru = lineScoreArray?.length
-      ? lineScoreArray.length
-      : teeTime
-        ? moment
-            .utc(teeTime)
-            .subtract(2, "hours")
-            .format("h:mm A") // Subtract 2 hours to get UTC -2
-        : "—"
+  const teeTime = competitor?.linescores?.[0]?.teeTime;
 
-    return thru.toString()
-  }
+  // Determine Thru or Tee Time based on available data
+  const thru =
+    (lineScoreArray2?.length > 0 ? lineScoreArray2.length : undefined) ??
+    (lineScoreArray1?.length > 0 ? lineScoreArray1.length : undefined) ??
+    lineScoreArray0?.length ??
+    (teeTime
+      ? moment.utc(teeTime).subtract(2, "hours").format("h:mm A")
+      : "—");
+
+  return thru.toString();
+};
 
   // Get status from competitor
   const getStatus = (competitor: Competitor): string => {
@@ -264,10 +277,11 @@ export default function GolfLeaderboard() {
                           <span className="font-medium">{playerName}</span>
                           {player && (
                             <div className="text-sm text-gray-500">
-                              {/* Use the new function to determine whether to show Thru or Tee Time */}
-                              {player.linescores &&
-                                `${player.linescores[0]?.linescores?.length ? "Thru: " : "Tee: "}${getThruOrTeeTime(player)}`}
-                              {player.linescores?.[0]?.value !== undefined && ` | Today: ${getTodayScore(player)}`}
+                             
+                              {player.linescores?.[0]?.value !== undefined && `${getTodayScore(player)} `}
+                               {/* Use the new function to determine whether to show Thru or Tee Time */}
+                               {player.linescores &&
+                                `${player.linescores[0]?.linescores?.length ? "| Thru: " : "Tee: "}${getThruOrTeeTime(player)}`}
                             </div>
                           )}
                         </div>
@@ -282,10 +296,11 @@ export default function GolfLeaderboard() {
                       {findPlayerByName(group.wildcard) && (
                         <div className="text-sm text-gray-500">
                           {/* Use the new function for the wildcard player too */}
-                          {findPlayerByName(group.wildcard)?.linescores &&
-                            `${findPlayerByName(group.wildcard)?.linescores?.[0]?.linescores?.length ? "Thru: " : "Tee: "}${getThruOrTeeTime(findPlayerByName(group.wildcard)!)}`}
+                      
                           {findPlayerByName(group.wildcard)?.linescores?.[0]?.value !== undefined &&
-                            ` | Today: ${getTodayScore(findPlayerByName(group.wildcard)!)}`}
+                            `${getTodayScore(findPlayerByName(group.wildcard)!)}`}
+                            {findPlayerByName(group.wildcard)?.linescores &&
+                            `${findPlayerByName(group.wildcard)?.linescores?.[0]?.linescores?.length ? " | Thru: " : "Tee: "}${getThruOrTeeTime(findPlayerByName(group.wildcard)!)}`}
                         </div>
                       )}
                     </div>
