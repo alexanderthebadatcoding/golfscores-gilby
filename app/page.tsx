@@ -152,6 +152,17 @@ export default function GolfLeaderboard() {
     return scoreStr // Already has - for under par
   }
 
+ // Function to calculate Over/Under Par
+ const calculateOverUnderPar = (score: number, holesPlayed: number): string => {
+  const parValues = [4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]; // PAR per hole
+  let totalPar = 0;
+  for (let i = 0; i < holesPlayed; i++) {
+    totalPar += parValues[i] || 4;
+  }
+  const diff = score - totalPar;
+  return diff > 0 ? `+${diff}` : diff < 0 ? `${diff}` : "E";
+};
+
   const getTodayScore = (competitor: Competitor): string => {
     const lineScores = competitor.linescores;
   
@@ -168,27 +179,27 @@ export default function GolfLeaderboard() {
   
     return "";
   };
-  
+
 
   // Get thru or tee time based on available data
   const getThruOrTeeTime = (competitor: Competitor): string => {
-  const lineScoreArray2 = competitor?.linescores?.[2]?.linescores;
-  const lineScoreArray1 = competitor?.linescores?.[1]?.linescores;
-  const lineScoreArray0 = competitor?.linescores?.[0]?.linescores;
+    const lineScoreArray2 = competitor?.linescores?.[2]?.linescores;
+    const lineScoreArray1 = competitor?.linescores?.[1]?.linescores;
+    const lineScoreArray0 = competitor?.linescores?.[0]?.linescores;
 
-  const teeTime = competitor?.linescores?.[0]?.teeTime;
+    const teeTime = competitor?.linescores?.[0]?.teeTime;
 
-  // Determine Thru or Tee Time based on available data
-  const thru =
-    (lineScoreArray2?.length > 0 ? lineScoreArray2.length : undefined) ??
-    (lineScoreArray1?.length > 0 ? lineScoreArray1.length : undefined) ??
-    lineScoreArray0?.length ??
-    (teeTime
-      ? moment.utc(teeTime).subtract(2, "hours").format("h:mm A")
-      : "—");
+    // Determine Thru or Tee Time based on available data
+    const thru =
+      (lineScoreArray2?.length > 0 ? lineScoreArray2.length : undefined) ??
+      (lineScoreArray1?.length > 0 ? lineScoreArray1.length : undefined) ??
+      lineScoreArray0?.length ??
+      (teeTime
+        ? moment.utc(teeTime).subtract(2, "hours").format("h:mm A")
+        : "—");
 
-  return thru.toString();
-};
+    return thru.toString();
+  };
 
   // Get status from competitor
   const getStatus = (competitor: Competitor): string => {
@@ -277,11 +288,18 @@ export default function GolfLeaderboard() {
                           <span className="font-medium">{playerName}</span>
                           {player && (
                             <div className="text-sm text-gray-500">
-                             
                               {player.linescores?.[0]?.value !== undefined && `${getTodayScore(player)} `}
                                {/* Use the new function to determine whether to show Thru or Tee Time */}
                                {player.linescores &&
                                 `${player.linescores[0]?.linescores?.length ? "| Thru: " : "Tee: "}${getThruOrTeeTime(player)}`}
+                               <div>
+                               {player.linescores?.[1]?.value
+                                ? `Today: ${calculateOverUnderPar(
+                                player.linescores[1].value,
+                                player.linescores[1]?.linescores?.length || 0
+                                )}`
+                                : null}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -303,6 +321,14 @@ export default function GolfLeaderboard() {
                             `${findPlayerByName(group.wildcard)?.linescores?.[0]?.linescores?.length ? " | Thru: " : "Tee: "}${getThruOrTeeTime(findPlayerByName(group.wildcard)!)}`}
                         </div>
                       )}
+                      <div className="text-sm text-gray-500">
+                      {findPlayerByName(group.wildcard)?.linescores?.[1]?.value
+                      ? `Today: ${calculateOverUnderPar(
+                      findPlayerByName(group.wildcard)!.linescores![1].value,
+                      findPlayerByName(group.wildcard)!.linescores![1].linescores?.length || 0
+                       )}`
+                       : null}
+                        </div>
                     </div>
                     <div className="font-semibold">
                       {findPlayerByName(group.wildcard) ? formatScore(findPlayerByName(group.wildcard)!.score) : "N/A"}
