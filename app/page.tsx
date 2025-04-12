@@ -293,10 +293,10 @@ export default function GolfLeaderboard() {
                                {player.linescores &&
                                 `${player.linescores[0]?.linescores?.length ? "| Thru: " : "Tee: "}${getThruOrTeeTime(player)}`}
                                <div>
-                               {player.linescores?.[1]?.value
+                               {player.linescores?.[2]?.value
                                 ? `Today: ${calculateOverUnderPar(
-                                player.linescores[1].value,
-                                player.linescores[1]?.linescores?.length || 0
+                                player.linescores[2].value,
+                                player.linescores[2]?.linescores?.length || 0
                                 )}`
                                 : null}
                               </div>
@@ -322,10 +322,10 @@ export default function GolfLeaderboard() {
                         </div>
                       )}
                       <div className="text-sm text-gray-500">
-                      {findPlayerByName(group.wildcard)?.linescores?.[1]?.value
+                      {findPlayerByName(group.wildcard)?.linescores?.[2]?.value
                       ? `Today: ${calculateOverUnderPar(
-                      findPlayerByName(group.wildcard)!.linescores![1].value,
-                      findPlayerByName(group.wildcard)!.linescores![1].linescores?.length || 0
+                      findPlayerByName(group.wildcard)!.linescores![2].value,
+                      findPlayerByName(group.wildcard)!.linescores![2].linescores?.length || 0
                        )}`
                        : null}
                         </div>
