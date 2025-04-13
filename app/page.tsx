@@ -301,7 +301,7 @@ export default function GolfLeaderboard() {
                                 player.linescores[3].value,
                                 player.linescores[3]?.linescores?.length || 0
                                 )}`
-                                : "MC"}
+                                : null }
                               </div>
                             </div>
                           )}
@@ -330,7 +330,7 @@ export default function GolfLeaderboard() {
                       findPlayerByName(group.wildcard)!.linescores![3].value,
                       findPlayerByName(group.wildcard)!.linescores![3].linescores?.length || 0
                        )}`
-                       : "MC"}
+                       : null }
                         </div>
                     </div>
                     <div className="font-semibold">
