@@ -169,7 +169,8 @@ export default function GolfLeaderboard() {
     const scores = [
       lineScores?.[0]?.value,
       lineScores?.[1]?.value,
-      lineScores?.[2]?.value
+      lineScores?.[2]?.value,
+      lineScores?.[3]?.value
     ]
       .filter(val => val !== undefined && val !== 0); // Filter out undefined and 0 values
   
@@ -183,6 +184,7 @@ export default function GolfLeaderboard() {
 
   // Get thru or tee time based on available data
   const getThruOrTeeTime = (competitor: Competitor): string => {
+    const lineScoreArray3 = competitor?.linescores?.[3]?.linescores;
     const lineScoreArray2 = competitor?.linescores?.[2]?.linescores;
     const lineScoreArray1 = competitor?.linescores?.[1]?.linescores;
     const lineScoreArray0 = competitor?.linescores?.[0]?.linescores;
@@ -191,6 +193,7 @@ export default function GolfLeaderboard() {
 
     // Determine Thru or Tee Time based on available data
     const thru =
+      (lineScoreArray3?.length > 0 ? lineScoreArray3.length : undefined) ??
       (lineScoreArray2?.length > 0 ? lineScoreArray2.length : undefined) ??
       (lineScoreArray1?.length > 0 ? lineScoreArray1.length : undefined) ??
       lineScoreArray0?.length ??
